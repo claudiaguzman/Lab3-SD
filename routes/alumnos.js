@@ -1,6 +1,6 @@
 var Alumno;
 var mongoose = require('mongoose');
-
+var bds=['mongodb://lab3sd:lab3sd@192.168.50.11:27017/primer_base', 'mongodb://lab3sd:lab3sd@192.168.50.15:27017/primer_base']
 exports.setModel = function(modelo){
 	Alumno = modelo;
 };
@@ -28,6 +28,53 @@ exports.create = function(req, res){
 		})
 	});
 };
+
+exports.buscar = function(req, res){
+	res.render('alumnos/buscar', {
+		put: false,
+		action: '/alumnos/buscar',
+		alumno: new Alumno({
+			nombre: '',
+			apellido: '',
+			rut: '',
+			carrera: ''
+		})
+	});
+};
+
+exports.buscar1= function(req, res){
+	var alumno = Alumno({
+		rut: req.body.rut
+	});
+	var crypto = require('crypto');
+	var sha1 = crypto.createHash('sha1').update(alumno.rut).digest("hex");
+	var mod = require('hash-mod')(2);
+	var idbd=mod(sha1);
+	var consulta = {
+				"rut": alumno.rut
+			};
+	mongoose.connect(bds[idbd], function(error){
+		if(error){
+			throw error;		
+		}else{
+			console.log('Conectado a MongoDB');
+		}
+	});
+
+	var query = Alumno.findOne(consulta);
+
+	// selecting the `name` and `occupation` fields
+	query.select('nombre apellido carrera');
+
+	// execute the query at a later time
+	query.exec(function (err, alum) {
+	  if (err) {console.log(err);}
+	  	console.log('%s %s %s.', alum.nombre, alum.apellido, alum.carrera) 
+
+		  mongoose.disconnect();
+	})
+	
+}
 exports.store = function(req, res){
 	var alumno = new Alumno({
 		nombre: req.body.nombre,
@@ -35,14 +82,13 @@ exports.store = function(req, res){
 		rut: req.body.rut,
 		carrera: req.body.carrera
 	});
-	var servs=['ip1', 'ip2', 'ip3']
 	var crypto = require('crypto');
 	var sha1 = crypto.createHash('sha1').update(alumno.rut).digest("hex");
 	console.log(alumno.rut)
 	console.log(sha1);
-	var mod = require('hash-mod')(3);
+	var mod = require('hash-mod')(2);
 	console.log(mod(sha1))
-	mongoose.connect('mongodb://lab3sd:lab3sd@192.168.50.11:27017/primer_base', function(error){
+	mongoose.connect(bds[mod(sha1)], function(error){
 		if(error){
 			throw error;		
 		}else{

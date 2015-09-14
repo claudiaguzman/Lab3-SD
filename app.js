@@ -60,7 +60,9 @@ app.get('/users', user.list);
 
 app.get('/alumnos', alumnos.index);
 app.get('/alumnos/create', alumnos.create);
+app.get('/alumnos/buscar', alumnos.buscar);
 app.post('/alumnos', alumnos.store);
+app.post('/alumnos/buscar', alumnos.buscar1);
 app.get('/alumnos/:id', alumnos.show);
 app.get('/alumnos/:id/edit', alumnos.edit);
 app.put('/alumnos/:id', alumnos.update);
