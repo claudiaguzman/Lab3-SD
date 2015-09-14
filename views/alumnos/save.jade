@@ -1,0 +1,24 @@
+﻿extends ../layout
+block content
+  h1 Guardar alumno
+  form(method="post", action="#{action}")
+    -if(put)
+      input(type="hidden", name="_method", value="PUT")
+    label Nombre
+    br
+    input(type="text", name="nombre", required="required", value="#{alumno.nombre}")
+    br
+    label Apellido
+    br
+    input(type="text", name="apellido", required="required", value="#{alumno.apellido}")
+    br
+    label Rut
+    br
+    input(type="text", name="rut", required="required", value="#{alumno.rut}")
+    br
+    label Carrera
+    br
+    input(type="text", name="carrera", required="required", value="#{alumno.carrera}")
+    br
+    input(type="submit", value="Guardar")
+    a(href="/alumnos") Cancelar

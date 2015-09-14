@@ -1,0 +1,7 @@
+db.createUser({
+    user:"lab3sd",
+    pwd:"lab3sd",
+    roles:[
+    	{role : "readWrite", db : "primer_base"}
+    ]
+});
