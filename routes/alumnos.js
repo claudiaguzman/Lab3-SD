@@ -1,6 +1,6 @@
 var Alumno;
 var mongoose = require('mongoose');
-var bds=['mongodb://lab3sd:lab3sd@192.168.50.11:27017/primer_base', 'mongodb://lab3sd:lab3sd@192.168.50.15:27017/primer_base']
+var bds=['mongodb://lab3sd:lab3sd@10.42.0.1:27017/primer_base', 'mongodb://lab3sd:lab3sd@10.42.0.18:27017/primer_base']
 exports.setModel = function(modelo){
 	Alumno = modelo;
 };
@@ -14,7 +14,38 @@ exports.index = function(req, res){
 			});
 		}
 	})*/
-	res.render('alumnos/index')
+var os = require( 'os' );
+
+var networkInterfaces = os.networkInterfaces( );
+
+console.log( networkInterfaces['wlan0'][0]['address'] );
+var ip=networkInterfaces['wlan0'][0]['address']
+	mongoose.connect('mongodb://lab3sd:lab3sd@'+ip+':27017/primer_base', function(error){
+		if(error){
+			throw error;		
+		}else{
+			console.log('Conectado a MongoDB');
+		}
+	});
+
+	process.on('uncaughtException', function (err) {
+    	console.log(err);
+	});
+
+
+
+Alumno.find({}, function(error, alumnos){
+		if(error){
+			res.send('Ha surgido un error.');
+		}else{
+			res.render('alumnos/index', {
+				alumnos: alumnos
+			});
+
+				mongoose.disconnect();
+		}
+	})
+	//res.render('alumnos/index')
 };
 exports.create = function(req, res){
 	res.render('alumnos/save', {
@@ -70,9 +101,80 @@ exports.buscar1= function(req, res){
 	query.exec(function (err, alum) {
 	  if (err) {console.log(err);}
 	  	console.log('%s %s %s.', alum.nombre, alum.apellido, alum.carrera) 
-
+		res.render('alumnos/show', {
+				alumno: alum
+			});
 		  mongoose.disconnect();
 	})
+	
+}
+
+exports.buscar2 = function(req, res){
+	res.render('alumnos/buscar2', {
+		put: false,
+		action: '/alumnos/buscar2',
+		alumno: new Alumno({
+			nombre: '',
+			apellido: '',
+			rut: '',
+			carrera: ''
+		})
+	});
+};
+
+exports.buscar3= function(req, res){
+	var alumno = Alumno({
+		nombre: req.body.nombre,
+		apellido: req.body.apellido,
+		carrera: req.body.carrera
+	});
+	var arreglo=[];
+	if (alumno.nombre!="" && alumno.apellido!="" && alumno.carrera!=""){
+		var consulta = {
+				"nombre": alumno.nombre,
+				"apellido": alumno.apellido,
+				"carrera": alumno.carrera
+			};
+	}
+	if (alumno.nombre!="" && alumno.apellido!="" && alumno.carrera==""){
+		var consulta = {
+				"nombre": alumno.nombre,
+				"apellido": alumno.apellido
+			};
+	}
+	var mongooses=[];
+	mongooses[0] = require('mongoose');
+	mongooses[1] = require('mongoose');
+	for (var i=0; i<2; i++){
+		console.log(i+"INtento conectar")
+		mongooses[i].connect(bds[i], function(error){
+			if(error){
+				throw error;		
+			}else{
+				console.log('Conectado a MongoDB');
+			}
+		})
+
+		var query = Alumno.find(consulta);
+		//console.log(query)
+		// selecting the `name` and `occupation` fields
+		query.select('nombre apellido carrera');
+		//console.log(query)
+		// execute the query at a later time
+		query.exec(function (err, alum) {
+		  if (err) {console.log(err);}
+		  	//console.log('%s %s %s.', alum.nombre, alum.apellido, alum.carrera) 
+		  	console.log(alum)
+		  	arreglo.push(alum);
+		  	console.log(i+"intento salir")
+			  mongooses[i].disconnect();
+		}) 
+	} 
+	console.log(arreglo);
+				res.render('alumnos/index', {
+					alumnos: arreglo
+				});
+	//console.log(query)
 	
 }
 exports.store = function(req, res){

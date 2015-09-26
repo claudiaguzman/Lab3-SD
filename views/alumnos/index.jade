@@ -2,4 +2,30 @@
 block content
   h1 Alumnos
   p
-    a(href="/alumnos/create") Crear nuevo alumno
+    a(href="/alumnos/create") Agregar alumno
+  p
+
+    a(href="/alumnos/buscar") Buscar alumno por rut
+  -if(alumnos.length > 0)
+    table
+      thead
+        tr
+          th Nombre
+          th Apellido
+          th Rut
+          th Carrera
+          th
+          th
+          th
+          th
+          th
+      tbody
+        -each item in alumnos
+          tr
+            td #{item.nombre}
+            td #{item.apellido}
+            td #{item.rut}
+            td #{item.carrera]
+            
+  -else
+    p No hay alumnos

@@ -2,13 +2,17 @@
 block content
   h1 Personajes de peliculas
   p
-    a(href="/personajes/create") Crear nuevo personaje
-  -if(personajes.length > 0)
+    a(href="/alumnos/create") Crear nuevo personaje
+  -if(alumnos.length > 0)
     table
       thead
         tr
           th Nombre
-          th Pelicula
+          th Apellido
+          th Rut
+          th Carrea
+          th
+          th
           th
           th
           th
@@ -16,14 +20,25 @@ block content
         -each item in personajes
           tr
             td #{item.nombre}
-            td #{item.pelicula}
+            td #{item.apellido}
+            td #{item.rut}
+            td #{item.carrera]
             td 
-              a(href="/personajes/#{item._id}") Ver
+              a(href="/alumnoss/#{item._id}") Ver
             td 
-              a(href="/personajes/#{item._id}/edit") Editar
+              a(href="/alumnos/#{item._id}/edit") Editar
             td
-              form(method="post", action="/personajes/#{item._id}")
+              form(method="post", action="/alumnos/#{item._id}")
                 input(type="hidden", name="_method", value="DELETE")
                 a(href="javascript:void(0);", onclick="if(confirm('¿Está seguro que desea eliminar este registro?')){this.parentNode.submit();}") Eliminar
   -else
     p No existen personajes creados
+
+    
+    
+    
+    extends ../layout
+block content
+  h1 Alumnos
+  p
+    a(href="/alumnos/create") Crear nuevo alumno

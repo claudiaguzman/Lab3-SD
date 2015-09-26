@@ -4,21 +4,10 @@ block content
   form(method="post", action="#{action}")
     -if(put)
       input(type="hidden", name="_method", value="PUT")
-    label Nombre
-    br
-    input(type="text", name="nombre", value="#{alumno.nombre}")
-    br
-    label Apellido
-    br
-    input(type="text", name="apellido", value="#{alumno.apellido}")
-    br
     label Rut
     br
     input(type="text", name="rut", required="required", value="#{alumno.rut}")
     br
-    label Carrera
-    br
-    input(type="text", name="carrera", value="#{alumno.carrera}")
-    br
+
     input(type="submit", value="Buscar")
     a(href="/alumnos/resultado") Cancelar
