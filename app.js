@@ -57,7 +57,7 @@ if ('development' == app.get('env')) {
 
 app.get('/', routes.index);
 app.get('/users', user.list);
-
+app.get('/alumnos/sinresultado');
 app.get('/alumnos', alumnos.index);
 app.get('/alumnos/create', alumnos.create);
 app.get('/alumnos/buscar', alumnos.buscar);

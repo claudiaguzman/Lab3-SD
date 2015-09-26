@@ -1,6 +1,8 @@
 var Alumno;
 var mongoose = require('mongoose');
-var bds=['mongodb://lab3sd:lab3sd@10.42.0.1:27017/primer_base', 'mongodb://lab3sd:lab3sd@10.42.0.18:27017/primer_base']
+	var ReadWriteLock = require('rwlock');
+	var lock = new ReadWriteLock();
+var bds=['mongodb://lab3sd:lab3sd@192.168.50.11:27017/primer_base', 'mongodb://lab3sd:lab3sd@192.168.50.11:27017/primer_base']
 exports.setModel = function(modelo){
 	Alumno = modelo;
 };
@@ -100,10 +102,16 @@ exports.buscar1= function(req, res){
 	// execute the query at a later time
 	query.exec(function (err, alum) {
 	  if (err) {console.log(err);}
-	  	console.log('%s %s %s.', alum.nombre, alum.apellido, alum.carrera) 
-		res.render('alumnos/show', {
-				alumno: alum
+	  	if (alum!=null){
+		  	console.log('%s %s %s.', alum.nombre, alum.apellido, alum.carrera) 
+			res.render('alumnos/show', {
+					alumno: alum
 			});
+		}
+		else{
+			res.render('alumnos/sinresultado', {
+			});
+		}
 		  mongoose.disconnect();
 	})
 	
@@ -142,34 +150,35 @@ exports.buscar3= function(req, res){
 				"apellido": alumno.apellido
 			};
 	}
-	var mongooses=[];
-	mongooses[0] = require('mongoose');
-	mongooses[1] = require('mongoose');
 	for (var i=0; i<2; i++){
-		console.log(i+"INtento conectar")
-		mongooses[i].connect(bds[i], function(error){
-			if(error){
-				throw error;		
-			}else{
-				console.log('Conectado a MongoDB');
-			}
-		})
+		lock.writeLock(function (release) {
+			console.log(i+"INtento conectar")
+			mongoose.connect(bds[i], function(error){
+				if(error){
+					throw error;		
+				}else{
+					console.log('Conectado a MongoDB');
+				}
+			})
 
-		var query = Alumno.find(consulta);
-		//console.log(query)
-		// selecting the `name` and `occupation` fields
-		query.select('nombre apellido carrera');
-		//console.log(query)
-		// execute the query at a later time
-		query.exec(function (err, alum) {
-		  if (err) {console.log(err);}
-		  	//console.log('%s %s %s.', alum.nombre, alum.apellido, alum.carrera) 
-		  	console.log(alum)
-		  	arreglo.push(alum);
-		  	console.log(i+"intento salir")
-			  mongooses[i].disconnect();
-		}) 
+			var query = Alumno.find(consulta);
+			//console.log(query)
+			// selecting the `name` and `occupation` fields
+			query.select('nombre apellido carrera');
+			//console.log(query)
+			// execute the query at a later time
+			query.exec(function (err, alum) {
+			  if (err) {console.log(err);}
+			  	//console.log('%s %s %s.', alum.nombre, alum.apellido, alum.carrera) 
+			  	console.log(alum)
+			  	arreglo.push(alum);
+			  	console.log(i+"intento salir")
+				  mongoose.disconnect();
+			}) 
+			release();
+		});
 	} 
+
 	console.log(arreglo);
 				res.render('alumnos/index', {
 					alumnos: arreglo
