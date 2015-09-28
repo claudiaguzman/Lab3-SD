@@ -134,13 +134,35 @@ exports.buscar2 = function(req, res){
 	});
 };
 
+function busqueda (consulta, resultado){
+	var arreglo=[]
+	mongooses=[]
+	for (var i=0; i<3; i++){
+			console.log(i+"INtento conectar")
+			mongooses[i]= mongoose.createConnection(bds[i]);
+			var AlumnoModel=mongooses[i].model('Alumno', AlumnoSchema);
+			var query = AlumnoModel.find(consulta);
+			//console.log(query)
+			// selecting the `name` and `occupation` fields
+			query.select('nombre apellido rut carrera');
+			//console.log(query)
+			// execute the query at a later time
+			query.exec(function (err, alum) {
+			  if (err) {console.log(err);}
+			  	//console.log('%s %s %s.', alum.nombre, alum.apellido, alum.carrera) 
+			  	console.log(alum)
+			  	arreglo.push(alum);
+			  	//console.log(arreglo)
+			})
+	}
+	resultado(arreglo);
+};
 exports.buscar3= function(req, res){
 	var alumno = Alumno({
 		nombre: req.body.nombre,
 		apellido: req.body.apellido,
 		carrera: req.body.carrera
-	});
-	var arreglo=[];
+	});;
 	if (alumno.nombre!="" && alumno.apellido!="" && alumno.carrera!=""){
 		var consulta = {
 				"nombre": alumno.nombre,
@@ -181,30 +203,12 @@ exports.buscar3= function(req, res){
 				"carrera": alumno.carrera
 			};
 	}
-	mongooses=[]
-	for (var i=0; i<3; i++){
-			console.log(i+"INtento conectar")
-			mongooses[i]= mongoose.createConnection(bds[i]);
-			var AlumnoModel=mongooses[i].model('Alumno', AlumnoSchema);
-			var query = AlumnoModel.find(consulta);
-			//console.log(query)
-			// selecting the `name` and `occupation` fields
-			query.select('nombre apellido rut carrera');
-			//console.log(query)
-			// execute the query at a later time
-			query.exec(function (err, alum) {
-			  if (err) {console.log(err);}
-			  	//console.log('%s %s %s.', alum.nombre, alum.apellido, alum.carrera) 
-			  	console.log(alum)
-			  	arreglo.push(alum);
-			})
-	} 
-
-	console.log(arreglo);
-				res.render('alumnos/index', {
-					alumnos: arreglo
+ 
+	busqueda(consulta, function(arr){
+			res.render('alumnos/index', {
+					alumnos: arr
 				});
-	//console.log(query)
+	});
 };
 exports.store = function(req, res){
 	var alumno = new Alumno({
