@@ -154,6 +154,33 @@ exports.buscar3= function(req, res){
 				"apellido": alumno.apellido
 			};
 	}
+	if (alumno.nombre!="" && alumno.apellido=="" && alumno.carrera!=""){
+		var consulta = {
+				"nombre": alumno.nombre,
+				"carrera": alumno.carrera
+			};
+	}
+	if (alumno.nombre=="" && alumno.apellido!="" && alumno.carrera!=""){
+		var consulta = {
+				"apellido": alumno.apellido,
+				"carrera": alumno.carrera
+			};
+	}
+	if (alumno.nombre!="" && alumno.apellido=="" && alumno.carrera==""){
+		var consulta = {
+				"nombre": alumno.nombre
+			};
+	}
+	if (alumno.nombre=="" && alumno.apellido!="" && alumno.carrera==""){
+		var consulta = {
+				"apellido": alumno.apellido
+			};
+	}
+	if (alumno.nombre=="" && alumno.apellido=="" && alumno.carrera!=""){
+		var consulta = {
+				"carrera": alumno.carrera
+			};
+	}
 	mongooses=[]
 	for (var i=0; i<3; i++){
 			console.log(i+"INtento conectar")
@@ -162,7 +189,7 @@ exports.buscar3= function(req, res){
 			var query = AlumnoModel.find(consulta);
 			//console.log(query)
 			// selecting the `name` and `occupation` fields
-			query.select('nombre apellido carrera');
+			query.select('nombre apellido rut carrera');
 			//console.log(query)
 			// execute the query at a later time
 			query.exec(function (err, alum) {
