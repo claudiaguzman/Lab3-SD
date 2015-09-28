@@ -2,9 +2,13 @@ var Alumno;
 var mongoose = require('mongoose');
 	var ReadWriteLock = require('rwlock');
 	var lock = new ReadWriteLock();
-var bds=['mongodb://lab3sd:lab3sd@192.168.50.11:27017/primer_base', 'mongodb://lab3sd:lab3sd@192.168.50.11:27017/primer_base']
+var bds=['mongodb://lab3sd:lab3sd@192.168.50.11:27017/primer_base','mongodb://lab3sd:lab3sd@192.168.50.11:27017/primer_base', 'mongodb://lab3sd:lab3sd@192.168.50.11:27017/primer_base']
 exports.setModel = function(modelo){
 	Alumno = modelo;
+};
+var AlumnoSchema;
+exports.setSchema = function(schema){
+	AlumnoSchema=schema;
 };
 exports.index = function(req, res){
 	/*Personaje.find({}, function(error, personajes){
@@ -81,7 +85,7 @@ exports.buscar1= function(req, res){
 	});
 	var crypto = require('crypto');
 	var sha1 = crypto.createHash('sha1').update(alumno.rut).digest("hex");
-	var mod = require('hash-mod')(2);
+	var mod = require('hash-mod')(3);
 	var idbd=mod(sha1);
 	var consulta = {
 				"rut": alumno.rut
@@ -150,18 +154,12 @@ exports.buscar3= function(req, res){
 				"apellido": alumno.apellido
 			};
 	}
-	for (var i=0; i<2; i++){
-		lock.writeLock(function (release) {
+	mongooses=[]
+	for (var i=0; i<3; i++){
 			console.log(i+"INtento conectar")
-			mongoose.connect(bds[i], function(error){
-				if(error){
-					throw error;		
-				}else{
-					console.log('Conectado a MongoDB');
-				}
-			})
-
-			var query = Alumno.find(consulta);
+			mongooses[i]= mongoose.createConnection(bds[i]);
+			var AlumnoModel=mongooses[i].model('Alumno', AlumnoSchema);
+			var query = AlumnoModel.find(consulta);
 			//console.log(query)
 			// selecting the `name` and `occupation` fields
 			query.select('nombre apellido carrera');
@@ -172,11 +170,7 @@ exports.buscar3= function(req, res){
 			  	//console.log('%s %s %s.', alum.nombre, alum.apellido, alum.carrera) 
 			  	console.log(alum)
 			  	arreglo.push(alum);
-			  	console.log(i+"intento salir")
-				  mongoose.disconnect();
-			}) 
-			release();
-		});
+			})
 	} 
 
 	console.log(arreglo);
@@ -184,8 +178,7 @@ exports.buscar3= function(req, res){
 					alumnos: arreglo
 				});
 	//console.log(query)
-	
-}
+};
 exports.store = function(req, res){
 	var alumno = new Alumno({
 		nombre: req.body.nombre,
@@ -197,7 +190,7 @@ exports.store = function(req, res){
 	var sha1 = crypto.createHash('sha1').update(alumno.rut).digest("hex");
 	console.log(alumno.rut)
 	console.log(sha1);
-	var mod = require('hash-mod')(2);
+	var mod = require('hash-mod')(3);
 	console.log(mod(sha1))
 	mongoose.connect(bds[mod(sha1)], function(error){
 		if(error){
