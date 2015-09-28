@@ -26,6 +26,14 @@ block content
             td #{item.apellido}
             td #{item.rut}
             td #{item.carrera]
+            td 
+              a(href="/alumnoss/#{item._id}") Ver
+            td 
+              a(href="/alumnos/#{item._id}/edit") Editar
+            td
+              form(method="post", action="/alumnos/#{item._id}")
+                input(type="hidden", name="_method", value="DELETE")
+                a(href="javascript:void(0);", onclick="if(confirm('¿Está seguro que desea eliminar este registro?')){this.parentNode.submit();}") Eliminar
             
   -else
     p No hay alumnos

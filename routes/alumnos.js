@@ -134,7 +134,7 @@ exports.buscar2 = function(req, res){
 	});
 };
 
-function busqueda (consulta, resultado){
+function busqueda (consulta, callback){
 	var arreglo=[]
 	mongooses=[]
 	for (var i=0; i<3; i++){
@@ -150,19 +150,19 @@ function busqueda (consulta, resultado){
 			query.exec(function (err, alum) {
 			  if (err) {console.log(err);}
 			  	//console.log('%s %s %s.', alum.nombre, alum.apellido, alum.carrera) 
-			  	console.log(alum)
+			  	//console.log(alum)
 			  	arreglo.push(alum);
 			  	//console.log(arreglo)
 			})
 	}
-	resultado(arreglo);
+	setTimeout(function() { callback(arreglo); }, 1000);
 };
 exports.buscar3= function(req, res){
 	var alumno = Alumno({
 		nombre: req.body.nombre,
 		apellido: req.body.apellido,
 		carrera: req.body.carrera
-	});;
+	});
 	if (alumno.nombre!="" && alumno.apellido!="" && alumno.carrera!=""){
 		var consulta = {
 				"nombre": alumno.nombre,
@@ -205,6 +205,7 @@ exports.buscar3= function(req, res){
 	}
  
 	busqueda(consulta, function(arr){
+			console.log(arr);
 			res.render('alumnos/index', {
 					alumnos: arr
 				});
