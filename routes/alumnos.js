@@ -2,7 +2,7 @@ var Alumno;
 var mongoose = require('mongoose');
 	var ReadWriteLock = require('rwlock');
 	var lock = new ReadWriteLock();
-var bds=['mongodb://lab3sd:lab3sd@192.168.50.11:27017/primer_base','mongodb://lab3sd:lab3sd@192.168.50.11:27017/primer_base', 'mongodb://lab3sd:lab3sd@192.168.50.11:27017/primer_base']
+var bds=['mongodb://lab3sd:lab3sd@10.42.0.18:27017/primer_base','mongodb://lab3sd:lab3sd@10.42.0.16:27017/primer_base', 'mongodb://lab3sd:lab3sd@10.42.0.1:27017/primer_base']
 exports.setModel = function(modelo){
 	Alumno = modelo;
 };
@@ -135,9 +135,9 @@ exports.buscar2 = function(req, res){
 };
 
 function busqueda (consulta, callback){
-	var arreglo=[]
-	mongooses=[]
-	for (var i=0; i<3; i++){
+	var arreglo=[];
+	mongooses=[];
+	for (var i=0; i<bds.length; i++){
 			console.log(i+"INtento conectar")
 			mongooses[i]= mongoose.createConnection(bds[i]);
 			var AlumnoModel=mongooses[i].model('Alumno', AlumnoSchema);
@@ -149,13 +149,18 @@ function busqueda (consulta, callback){
 			// execute the query at a later time
 			query.exec(function (err, alum) {
 			  if (err) {console.log(err);}
-			  	//console.log('%s %s %s.', alum.nombre, alum.apellido, alum.carrera) 
-			  	//console.log(alum)
-			  	arreglo.push(alum);
-			  	//console.log(arreglo)
+			   
+			  for (var j=0; j<alum.length; j++){
+			  	console.log('%s %s %s.', alum[j].nombre, alum[j].apellido, alum[j].carrera)
+			  var aux={
+			  	nombre: alum[j].nombre, 
+			  	apellido: alum[j].apellido, 
+			  	rut: alum[j].rut, 
+			  	carrera: alum[j].carrera} 
+			  	arreglo.push(aux);}
 			})
 	}
-	setTimeout(function() { callback(arreglo); }, 1000);
+	setTimeout(function() { callback(arreglo); }, 3000);
 };
 exports.buscar3= function(req, res){
 	var alumno = Alumno({
@@ -205,7 +210,7 @@ exports.buscar3= function(req, res){
 	}
  
 	busqueda(consulta, function(arr){
-			console.log(arr);
+		console.log(arr);
 			res.render('alumnos/index', {
 					alumnos: arr
 				});
